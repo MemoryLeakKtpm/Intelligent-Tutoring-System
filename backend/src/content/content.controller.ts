@@ -7,7 +7,10 @@ import {
   Param,
   Delete,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ContentService } from './content.service';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
@@ -19,6 +22,14 @@ import { UserRole } from '../users/user.entity';
 @Controller('content')
 export class ContentController {
   constructor(private readonly contentService: ContentService) {}
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRole.INSTRUCTOR)
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file', { dest: './data/files' }))
+  uploadFile(@UploadedFile() file: Express.Multer.File) {
+    return { filename: file.filename, path: file.path };
+  }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(UserRole.INSTRUCTOR)
