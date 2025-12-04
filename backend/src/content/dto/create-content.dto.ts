@@ -24,16 +24,14 @@ export enum TagNamespace {
 }
 
 class TagDto {
-  @IsString()
+  @IsEnum(TagNamespace)
   @IsNotEmpty()
-  @MinLength(2)
-  @MinLength(32)
   namespace: TagNamespace;
 
   @IsString()
   @IsNotEmpty()
   @MinLength(2)
-  @MinLength(32)
+  @MaxLength(32)
   name: string;
 }
 
