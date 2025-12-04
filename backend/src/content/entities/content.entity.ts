@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { ContentType } from '../dto/create-content.dto';
 import { User } from '../../users/user.entity';
@@ -33,6 +34,23 @@ export class Content {
   @ManyToOne(() => User, (user) => user.content)
   @JoinColumn({ name: 'creatorId' })
   creator: User;
+
+  @Column({ type: 'uuid', nullable: true })
+  parentContentId: string;
+
+  @ManyToOne(() => Content, (content) => content.children)
+  @JoinColumn({ name: 'parentContentId' })
+  parentContent: Content;
+
+  @OneToMany(() => Content, (content) => content.parentContent)
+  children: Content[];
+
+  @Column({ type: 'uuid', nullable: true })
+  groupInstructorId: string;
+
+  @ManyToOne(() => User, (user) => user.instructedGroups)
+  @JoinColumn({ name: 'groupInstructorId' })
+  groupInstructor: User;
 
   @Column('json', { nullable: true })
   prerequisites: { contentId: string }[];

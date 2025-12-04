@@ -10,11 +10,13 @@ import {
   UseInterceptors,
   UploadedFile,
   Request,
+  Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ContentService } from './content.service';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
+import { GetContentFilterDto } from './dto/get-content-filter.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -41,8 +43,8 @@ export class ContentController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get()
-  findAll() {
-    return this.contentService.findAll();
+  findAll(@Query() filterDto: GetContentFilterDto) {
+    return this.contentService.findAll(filterDto);
   }
 
   @UseGuards(AuthGuard('jwt'))

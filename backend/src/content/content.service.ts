@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
+import { GetContentFilterDto } from './dto/get-content-filter.dto';
 import { Content } from './entities/content.entity';
 
 @Injectable()
@@ -23,8 +24,23 @@ export class ContentService {
     return this.contentRepository.save(content);
   }
 
-  async findAll(): Promise<Content[]> {
-    return this.contentRepository.find();
+  async findAll(filterDto: GetContentFilterDto): Promise<[Content[], number]> {
+    const { page, limit, instructorId } = filterDto;
+    const query = this.contentRepository.createQueryBuilder('content');
+
+    if (instructorId) {
+      query.andWhere('content.groupInstructorId = :instructorId', {
+        instructorId,
+      });
+    }
+
+    const skip = (page - 1) * limit;
+    const [content, total] = await query
+      .skip(skip)
+      .take(limit)
+      .getManyAndCount();
+
+    return [content, total];
   }
 
   async findOne(id: string): Promise<Content> {

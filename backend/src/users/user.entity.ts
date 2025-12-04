@@ -33,4 +33,7 @@ export class User {
 
   @OneToMany(() => Content, (content) => content.creator)
   content: Content[];
+
+  @OneToMany(() => Content, (content) => content.groupInstructor)
+  instructedGroups: Content[];
 }

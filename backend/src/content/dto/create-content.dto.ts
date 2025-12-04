@@ -8,6 +8,7 @@ import {
   IsNotEmpty,
   MaxLength,
   MinLength,
+  IsUUID,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -15,6 +16,7 @@ export enum ContentType {
   TEXT = 'text',
   FILE = 'file',
   QUIZ = 'quiz',
+  GROUP = 'group',
 }
 
 export enum TagNamespace {
@@ -76,6 +78,16 @@ export class CreateContentDto {
   @IsDateString()
   @IsOptional()
   deadline?: Date;
+
+  @IsOptional()
+  @IsString()
+  @IsUUID()
+  parentContentId?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsUUID()
+  groupInstructorId?: string;
 
   @IsArray()
   @ValidateNested({ each: true })
