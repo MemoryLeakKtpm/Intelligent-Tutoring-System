@@ -13,6 +13,7 @@ import { User } from '../../users/user.entity';
 
 @Entity()
 export class Content {
+  // Common fields for all content types
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -35,6 +36,13 @@ export class Content {
   @JoinColumn({ name: 'creatorId' })
   creator: User;
 
+  @Column('json', { nullable: true })
+  prerequisites: { contentId: string }[];
+
+  @Column({ type: 'enum', enum: ContentType, default: ContentType.TEXT })
+  type: ContentType;
+
+  // Associated with ContentType.GROUP
   @Column({ type: 'uuid', nullable: true })
   parentContentId: string;
 
@@ -52,18 +60,15 @@ export class Content {
   @JoinColumn({ name: 'groupInstructorId' })
   groupInstructor: User;
 
-  @Column('json', { nullable: true })
-  prerequisites: { contentId: string }[];
-
-  @Column({ type: 'enum', enum: ContentType, default: ContentType.TEXT })
-  type: ContentType;
-
+  // Associated with ContentType.TEXT
   @Column({ nullable: true })
   text?: string;
 
+  // Associated with ContentType.FILE
   @Column({ nullable: true })
   fileUrl?: string;
 
+  // Associated with ContentType.QUIZ
   @Column('json', { nullable: true })
   questions?: {
     questionText: string;

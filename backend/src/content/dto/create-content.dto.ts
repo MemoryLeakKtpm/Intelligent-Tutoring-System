@@ -59,6 +59,7 @@ class QuestionDto {
 }
 
 export class CreateContentDto {
+  // Common fields for all content types
   @IsString()
   @IsNotEmpty()
   @MaxLength(256)
@@ -79,6 +80,16 @@ export class CreateContentDto {
   @IsOptional()
   deadline?: Date;
 
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => PrerequisiteDto)
+  @IsOptional()
+  prerequisites?: PrerequisiteDto[];
+
+  @IsEnum(ContentType)
+  type: ContentType;
+
+  // Associated with ContentType.GROUP
   @IsOptional()
   @IsString()
   @IsUUID()
@@ -89,23 +100,17 @@ export class CreateContentDto {
   @IsUUID()
   groupInstructorId?: string;
 
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => PrerequisiteDto)
-  @IsOptional()
-  prerequisites?: PrerequisiteDto[];
-
-  @IsEnum(ContentType)
-  type: ContentType;
-
+  // Associated with ContentType.TEXT
   @IsString()
   @IsOptional()
   text?: string;
 
+  // Associated with ContentType.FILE
   @IsString()
   @IsOptional()
   fileUrl?: string;
 
+  // Associated with ContentType.QUIZ
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => QuestionDto)
