@@ -4,12 +4,11 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
-  ChildEntity,
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
 import { ContentType } from '../dto/create-content.dto';
+import { User } from '../../users/user.entity';
 
 @Entity()
 export class Content {
@@ -27,6 +26,13 @@ export class Content {
 
   @Column({ type: 'timestamp', nullable: true })
   deadline: Date;
+
+  @Column({ type: 'uuid', nullable: true })
+  creatorId: string;
+
+  @ManyToOne(() => User, (user) => user.content)
+  @JoinColumn({ name: 'creatorId' })
+  creator: User;
 
   @Column('json', { nullable: true })
   prerequisites: { contentId: string }[];

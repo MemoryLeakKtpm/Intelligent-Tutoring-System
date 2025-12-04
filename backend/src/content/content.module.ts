@@ -3,9 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ContentService } from './content.service';
 import { ContentController } from './content.controller';
 import { Content } from './entities/content.entity';
+import { User } from '../users/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Content])],
+  imports: [TypeOrmModule.forFeature([Content, User])],
   controllers: [ContentController],
   providers: [ContentService],
 })

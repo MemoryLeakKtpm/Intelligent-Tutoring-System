@@ -9,6 +9,7 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  Request,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ContentService } from './content.service';
@@ -34,8 +35,8 @@ export class ContentController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(UserRole.INSTRUCTOR)
   @Post()
-  create(@Body() createContentDto: CreateContentDto) {
-    return this.contentService.create(createContentDto);
+  create(@Body() createContentDto: CreateContentDto, @Request() req) {
+    return this.contentService.create(createContentDto, req.user.userId);
   }
 
   @UseGuards(AuthGuard('jwt'))

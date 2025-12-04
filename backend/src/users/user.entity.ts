@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Content } from '../content/entities/content.entity';
 
 export enum UserRole {
   STUDENT = 'student',
@@ -29,4 +30,7 @@ export class User {
 
   @Column({ default: false })
   isTwoFactorEnabled: boolean;
+
+  @OneToMany(() => Content, (content) => content.creator)
+  content: Content[];
 }

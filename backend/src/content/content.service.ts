@@ -12,8 +12,14 @@ export class ContentService {
     private contentRepository: Repository<Content>,
   ) {}
 
-  async create(createContentDto: CreateContentDto): Promise<Content> {
-    const content = this.contentRepository.create(createContentDto);
+  async create(
+    createContentDto: CreateContentDto,
+    creatorId: string,
+  ): Promise<Content> {
+    const content = this.contentRepository.create({
+      ...createContentDto,
+      creatorId,
+    });
     return this.contentRepository.save(content);
   }
 
