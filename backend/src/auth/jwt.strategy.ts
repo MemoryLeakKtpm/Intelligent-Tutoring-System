@@ -5,15 +5,15 @@ import { JWT_KEY } from './key';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-    constructor() {
-        super({
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            ignoreExpiration: false,
-            secretOrKey: JWT_KEY,
-        });
-    }
+  constructor() {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
+      secretOrKey: JWT_KEY,
+    });
+  }
 
-    async validate(payload: any) {
-        return { userId: payload.sub, email: payload.username, role: payload.role };
-    }
+  async validate(payload: any) {
+    return { userId: payload.sub, email: payload.username, role: payload.role };
+  }
 }

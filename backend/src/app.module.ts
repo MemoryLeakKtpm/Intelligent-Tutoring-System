@@ -5,15 +5,15 @@ import { UsersModule } from './users/users.module';
 import { User } from './users/user.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forRoot({
-            type: 'sqlite',
-            database: 'data/elearning.db',
-            // TODO: figure out what to do with this.
-            synchronize: true,
-        }),
-        AuthModule,
-        UsersModule,
-    ],
+  imports: [
+    TypeOrmModule.forRoot({
+      type: 'sqlite',
+      database: 'data/elearning.db',
+      // TODO: figure out what to do with this.
+      synchronize: true,
+    }),
+    AuthModule,
+    UsersModule,
+  ],
 })
 export class AppModule {}
