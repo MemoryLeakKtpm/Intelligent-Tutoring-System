@@ -16,6 +16,7 @@ export class User {
     @Column({ unique: true })
     email: string;
 
+    // Despite the name, this is actually hashed in AuthService::register.
     @Column()
     password: string;
 
