@@ -51,6 +51,11 @@ export class ContentService {
     return content;
   }
 
+  async findMultiple(ids: string[]): Promise<Content[]> {
+    const content = await this.contentRepository.findByIds(ids);
+    return content;
+  }
+
   async update(
     id: string,
     updateContentDto: UpdateContentDto,
