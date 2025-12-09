@@ -13,7 +13,6 @@ import { User } from '../../users/user.entity';
 
 @Entity()
 export class Content {
-  // Common fields for all content types
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -23,30 +22,29 @@ export class Content {
   @Column({ nullable: true })
   description: string;
 
-  @Column('json', { nullable: true })
+  @Column('simple-json', { nullable: true })
   tags: { name: string }[];
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   deadline: Date;
 
   @Column({ type: 'uuid', nullable: true })
   creatorId: string;
 
-  @ManyToOne(() => User, (user) => user.content)
+  @ManyToOne(() => User, (user) => user.content, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'creatorId' })
   creator: User;
 
-  @Column('json', { nullable: true })
+  @Column('simple-json', { nullable: true })
   prerequisites: { contentId: string }[];
 
-  @Column({ type: 'enum', enum: ContentType, default: ContentType.TEXT })
+  @Column({ type: 'simple-enum', enum: ContentType, default: ContentType.TEXT })
   type: ContentType;
 
-  // Associated with ContentType.GROUP
   @Column({ type: 'uuid', nullable: true })
   parentContentId: string;
 
-  @ManyToOne(() => Content, (content) => content.children)
+  @ManyToOne(() => Content, (content) => content.children, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'parentContentId' })
   parentContent: Content;
 
@@ -60,16 +58,13 @@ export class Content {
   @JoinColumn({ name: 'groupInstructorId' })
   groupInstructor: User;
 
-  // Associated with ContentType.TEXT
   @Column({ nullable: true })
   text?: string;
 
-  // Associated with ContentType.FILE
   @Column({ nullable: true })
   fileUrl?: string;
 
-  // Associated with ContentType.QUIZ
-  @Column('json', { nullable: true })
+  @Column('simple-json', { nullable: true })
   questions?: {
     questionText: string;
     options: string[];

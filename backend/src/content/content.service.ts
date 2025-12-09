@@ -9,14 +9,11 @@ import { Content } from './entities/content.entity';
 @Injectable()
 export class ContentService {
   constructor(
-    @InjectRepository(Content)
-    private contentRepository: Repository<Content>,
+      @InjectRepository(Content)
+      private contentRepository: Repository<Content>,
   ) {}
 
-  async create(
-    createContentDto: CreateContentDto,
-    creatorId: string,
-  ): Promise<Content> {
+  async create(createContentDto: CreateContentDto, creatorId: string): Promise<Content> {
     const content = this.contentRepository.create({
       ...createContentDto,
       creatorId,
@@ -25,26 +22,42 @@ export class ContentService {
   }
 
   async findAll(filterDto: GetContentFilterDto): Promise<[Content[], number]> {
-    const { page, limit, instructorId } = filterDto;
+    
+    const page = Number(filterDto.page) || 1;
+    const limit = Number(filterDto.limit) || 10;
+    const { instructorId, parentContentId, isRoot } = filterDto;
+
     const query = this.contentRepository.createQueryBuilder('content');
 
     if (instructorId) {
-      query.andWhere('content.groupInstructorId = :instructorId', {
-        instructorId,
-      });
+      query.andWhere('content.groupInstructorId = :instructorId', { instructorId });
     }
 
+    
+    if (parentContentId) {
+      query.andWhere('content.parentContentId = :parentContentId', { parentContentId });
+    } else if (isRoot === 'true') {
+      
+      query.andWhere('content.parentContentId IS NULL');
+    }
+
+    
     const skip = (page - 1) * limit;
+
     const [content, total] = await query
-      .skip(skip)
-      .take(limit)
-      .getManyAndCount();
+        .orderBy('content.createdAt', 'DESC')
+        .skip(skip)
+        .take(limit)
+        .getManyAndCount();
 
     return [content, total];
   }
 
   async findOne(id: string): Promise<Content> {
-    const content = await this.contentRepository.findOne({ where: { id } });
+    const content = await this.contentRepository.findOne({
+      where: { id },
+      relations: ['children']
+    });
     if (!content) {
       throw new NotFoundException(`Content with ID "${id}" not found`);
     }
@@ -52,18 +65,12 @@ export class ContentService {
   }
 
   async findMultiple(ids: string[]): Promise<Content[]> {
-    const content = await this.contentRepository.findByIds(ids);
-    return content;
+    return this.contentRepository.findByIds(ids);
   }
 
-  async update(
-    id: string,
-    updateContentDto: UpdateContentDto,
-  ): Promise<Content> {
+  async update(id: string, updateContentDto: UpdateContentDto): Promise<Content> {
     const content = await this.findOne(id);
-    if (updateContentDto.type) {
-      delete updateContentDto.type;
-    }
+    if (updateContentDto.type) delete updateContentDto.type;
     this.contentRepository.merge(content, updateContentDto);
     return this.contentRepository.save(content);
   }

@@ -5,6 +5,7 @@ import {
   Max,
   IsString,
   IsUUID,
+  IsBooleanString,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -19,11 +20,23 @@ export class GetContentFilterDto {
   @Type(() => Number)
   @IsNumber()
   @Min(1)
-  @Max(30)
+  @Max(100) 
   limit?: number = 10;
 
   @IsOptional()
   @IsString()
   @IsUUID()
   instructorId?: string;
+
+  
+
+  @IsOptional()
+  @IsString()
+  @IsUUID()
+  parentContentId?: string;
+
+  @IsOptional()
+  @IsString()
+      
+  isRoot?: string;
 }

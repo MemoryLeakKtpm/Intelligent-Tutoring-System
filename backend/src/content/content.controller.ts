@@ -33,7 +33,10 @@ export class ContentController {
   @Post('upload')
   @UseInterceptors(FileInterceptor('file', { dest: './data/files' }))
   uploadFile(@UploadedFile() file: Express.Multer.File) {
-    return { filename: file.filename, path: file.path };
+    return {
+      filename: file.filename,
+      path: file.path.replace(/\\/g, '/')
+    };
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)

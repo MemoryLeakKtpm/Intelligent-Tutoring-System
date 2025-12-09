@@ -1,34 +1,29 @@
-import { Link, useNavigate } from 'react-router';
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import {useState} from "react";
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const API_URL = 'http://localhost:3001';
 
-const RegisterPage = () => {
+export default function Register() {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         password: '',
-        role: 'student'
+        role: 'student',
     });
     const [error, setError] = useState('');
-    const [success, setSuccess] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    const handleChange = (e) => {
-        setFormData(prev => ({ ...prev, [e.target.id || 'role']: e.target.value }));
-    };
-
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsSubmitting(true);
         setError('');
+        setLoading(true);
 
         try {
             const res = await fetch(`${API_URL}/auth/register`, {
@@ -37,79 +32,65 @@ const RegisterPage = () => {
                 body: JSON.stringify(formData),
             });
 
-            const data = await res.json();
-
             if (!res.ok) {
+                const data = await res.json();
                 throw new Error(data.message || 'Registration failed');
             }
 
-            setSuccess(true);
-            setTimeout(() => navigate('/login'), 2000);
-        } catch (err) {
+            navigate('/login');
+        } catch (err: any) {
             setError(err.message);
         } finally {
-            setIsSubmitting(false);
+            setLoading(false);
         }
     };
 
     return (
-        <div className="flex h-screen w-full items-center justify-center bg-slate-50 px-4">
-            <Card className="w-full max-w-sm">
-                <CardHeader>
-                    <CardTitle>Create Account</CardTitle>
-                    <CardDescription>Enter your information to create an account.</CardDescription>
+        <div className="flex items-center justify-center min-h-screen bg-slate-50 p-4">
+            <Card className="w-full max-w-md">
+                <CardHeader className="space-y-1">
+                    <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
+                    <CardDescription>Enter your details below to create your account</CardDescription>
                 </CardHeader>
-                <CardContent>
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit}>
+                    <CardContent className="space-y-4">
                         {error && (
-                            <div className="flex items-center gap-2 rounded-md bg-red-50 p-3 text-sm text-red-500">
-                                <AlertCircle className="h-4 w-4" />
-                                <span>{error}</span>
-                            </div>
+                            <Alert variant="destructive">
+                                <AlertDescription>{error}</AlertDescription>
+                            </Alert>
                         )}
-                        {success && (
-                            <div className="flex items-center gap-2 rounded-md bg-green-50 p-3 text-sm text-green-600">
-                                <CheckCircle2 className="h-4 w-4" />
-                                <span>Account created! Redirecting...</span>
-                            </div>
-                        )}
+
                         <div className="space-y-2">
                             <Label htmlFor="name">Full Name</Label>
                             <Input
                                 id="name"
                                 placeholder="John Doe"
-                                value={formData.name}
-                                onChange={handleChange}
                                 required
+                                value={formData.name}
+                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             />
                         </div>
+
                         <div className="space-y-2">
                             <Label htmlFor="email">Email</Label>
                             <Input
                                 id="email"
                                 type="email"
                                 placeholder="m@example.com"
+                                required
                                 value={formData.email}
-                                onChange={handleChange}
-                                required
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             />
                         </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="password">Password</Label>
-                            <Input
-                                id="password"
-                                type="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                required
-                                minLength={6}
-                            />
-                        </div>
+
                         <div className="space-y-2">
                             <Label htmlFor="role">Role</Label>
-                            <Select onValueChange={(value) => setFormData(prev => ({...prev, role: value}))} defaultValue={formData.role}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a role" />
+                            <Select
+                                value={formData.role}
+                                onValueChange={(val) => setFormData({ ...formData, role: val })}
+                            >
+                                <SelectTrigger id="role">
+                                    <SelectValue placeholder="Select your role" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="student">Student</SelectItem>
@@ -117,22 +98,31 @@ const RegisterPage = () => {
                                 </SelectContent>
                             </Select>
                         </div>
-                        <Button type="submit" className="w-full" disabled={isSubmitting || success}>
-                            {isSubmitting ? 'Registering...' : 'Register'}
+
+                        <div className="space-y-2">
+                            <Label htmlFor="password">Password</Label>
+                            <Input
+                                id="password"
+                                type="password"
+                                required
+                                value={formData.password}
+                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                            />
+                        </div>
+                    </CardContent>
+                    <CardFooter className="flex flex-col gap-4">
+                        <Button className="w-full" type="submit" disabled={loading}>
+                            {loading ? 'Creating account...' : 'Create Account'}
                         </Button>
-                    </form>
-                </CardContent>
-                <CardFooter className="justify-center">
-                    <p className="text-sm text-slate-500">
-                        Already have an account?{' '}
-                        <Link to="/login" className="text-slate-900 underline hover:text-slate-800">
-                            Login
-                        </Link>
-                    </p>
-                </CardFooter>
+                        <div className="text-sm text-center text-muted-foreground">
+                            Already have an account?{' '}
+                            <Link to="/login" className="text-primary hover:underline">
+                                Sign in
+                            </Link>
+                        </div>
+                    </CardFooter>
+                </form>
             </Card>
         </div>
     );
-};
-
-export default RegisterPage;
+}
